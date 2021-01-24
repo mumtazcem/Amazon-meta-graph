@@ -23,7 +23,7 @@ def main():
     g2PrList = []
 
     # Read all lines of the meta data into content list.
-    file_name = "amazon_first_100_mod.txt"
+    file_name = "amazon-meta.txt"
     #file_name = "deneme.txt"
     with open(file_name, encoding='utf8') as f:
         content = f.readlines()
@@ -33,7 +33,6 @@ def main():
     
         parser_colon = line.split(':')
         parser_space = line.split()
-
         if  len(parser_colon) > 1 and parser_space[0] != 'Total':
             if parser_colon[0] != 'categories' and parser_colon[0] != 'title':
                     
@@ -46,13 +45,14 @@ def main():
                     product = {**product, **dict(zip(similarityLabel, similarityLine))}
                     
                 elif parser_colon[0] == 'reviews' and parser_colon[1].strip() == 'total': 
-                        product['totalReview']  = parser_colon[2].split(' ')[1]
+                        product['totalReview']  = parser_colon[3].split(' ')[1]
                         product['avgRate']  = parser_colon[4].strip()
                         totalReview = int(product['totalReview'] )
                         if totalReview == 0:
                             product['totalVote'] = 0
                             productList.append(product)
                             product={}
+                        
                 
                 elif reviewCounter < totalReview:
                     if parser_space[1] == "cutomer:":
@@ -92,10 +92,11 @@ def main():
             if g2Counter == len(g2IdList):
                 break
                 
-    """            
+                
+        
     dataset = pd.DataFrame.from_dict(productList)
     dataset.to_csv("database.csv")
-
+    """    
     if dataFrameType == 1:
         g1g2Db = pd.concat([g1Db,g2Db])
         g1g2Db.to_csv("g1g2Db.csv")  
