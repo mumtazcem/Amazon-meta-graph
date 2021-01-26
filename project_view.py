@@ -5,7 +5,7 @@
 # Reference Metadata: https://snap.stanford.edu/data/amazon-meta.html
 # Visualization of Graphs and Adjacency Matrices
 
-# TODO Merge with project.py after all done.
+# TODO Merge with generate_weighted.py after all done.
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -64,30 +64,30 @@ def test_project_view():
     plt.title("NetworkData")
     plt.show()
 
-def draw_networkx_graph(G):    
+def draw_networkx_graph(G):
     pos=nx.spring_layout(G)
     nx.draw_networkx(G,pos)
     labels = nx.get_edge_attributes(G,'weight')
     nx.draw_networkx_edge_labels(G,pos,edge_labels=labels)
     plt.show()
-    
+
 convert_graph_to_adjecency_matrix = lambda G: nx.to_numpy_matrix(G)
 
 convert_adjecency_matrix_to_graph = lambda adjecency_matrix: nx.from_numpy_matrix(adjecency_matrix)
-    
+
 def show_adjacency_matrix_from_graph(G):
     adjacency_matrix = convert_graph_to_adjecency_matrix(G)
     plt.imshow(adjacency_matrix)
     plt.colorbar()
     plt.title("Adjacency matrix")
     plt.show()
-    
+
 def show_adjacency_matrix(adjacency_matrix):
     plt.imshow(adjacency_matrix)
     plt.colorbar()
     plt.title("Adjacency matrix")
     plt.show()
-    
+
 def plot_degree_dist(G):
     degrees = [G.degree(n) for n in G.nodes()]
     plt.hist(degrees)

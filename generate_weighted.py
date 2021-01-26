@@ -3,7 +3,6 @@ import numpy as np
 import networkx as nx
 import project_view as pv
 
-
 g1_file = "g1Db.csv"
 g2_file = "g2Db.csv"
 
@@ -86,6 +85,3 @@ if run_G2:
     pv.show_adjacency_matrix_from_graph(G2)
     pv.draw_networkx_graph(G2)
     pv.plot_degree_dist(G2)
-
-
-

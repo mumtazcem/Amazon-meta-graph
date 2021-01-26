@@ -1,14 +1,13 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import networkx as nx
 
-file_name = "amazon_first_100.txt"
-# file_name = "amazon-meta.txt"
+# file_name = "amazon_first_100.txt"
+file_name = "amazon-meta.txt"
 
 graph1_df_file = "saved_dataframes/g1Db.csv"
 graph2_df_file = "saved_dataframes/g2Db.csv"
 global_df_file = "saved_dataframes/database.csv"
+
 
 def main():
     product = {}
@@ -38,7 +37,8 @@ def main():
 
         parser_colon = line.split(':')
         parser_space = line.split()
-        if len(parser_colon) > 1 and parser_space[0] != 'Total':
+        if len(parser_colon) > 1 and parser_space[0] != 'Total' and not (
+        parser_space[0].startswith('|')):  # startswith is added to prevent category conflicts
             if parser_colon[0] != 'categories' and parser_colon[0] != 'title':
 
                 if parser_colon[0] == 'similar':
@@ -100,6 +100,11 @@ def main():
     dataset = pd.DataFrame.from_dict(productList)
     with open(global_df_file, 'w', newline='') as myfile:
         dataset.to_csv(global_df_file)
+
+    """   
+    dataset = pd.DataFrame.from_dict(productList)
+    dataset.to_csv("database.csv")"""
+
     """    
     if dataFrameType == 1:
         g1g2Db = pd.concat([g1Db,g2Db])
