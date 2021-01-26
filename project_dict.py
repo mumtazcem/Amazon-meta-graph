@@ -33,7 +33,7 @@ def main():
     
         parser_colon = line.split(':')
         parser_space = line.split()
-        if  len(parser_colon) > 1 and parser_space[0] != 'Total':
+        if  len(parser_colon) > 1 and parser_space[0] != 'Total'  and not(parser_space[0] .startswith('|')): # startswith is added to prevent category conflicts
             if parser_colon[0] != 'categories' and parser_colon[0] != 'title':
                     
                 if parser_colon[0] == 'similar':
@@ -93,9 +93,9 @@ def main():
                 break
                 
                 
-        
+    """   
     dataset = pd.DataFrame.from_dict(productList)
-    dataset.to_csv("database.csv")
+    dataset.to_csv("database.csv")"""
     """    
     if dataFrameType == 1:
         g1g2Db = pd.concat([g1Db,g2Db])
@@ -105,7 +105,7 @@ def main():
 
     g1Db= pd.DataFrame.from_dict(g1PrList)
     g1Db.to_csv("g1Db.csv")
-
+    """
     g2Db = pd.DataFrame.from_dict(g2PrList)
     g2Db.to_csv("g2Db.csv")    
     
@@ -133,7 +133,7 @@ def main():
     plt.figure()
     nx.draw(g2)  # networkx draw()
     plt.savefig("g2.png")     
-    
+    """
     
     
 if __name__ == "__main__":
