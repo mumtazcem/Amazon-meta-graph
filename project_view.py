@@ -99,4 +99,4 @@ def plot_degree_dist(G):
 def get_nodes_and_edges_number(G):
     return (G.number_of_nodes(), G.number_of_edges())
 
-test_project_view()
+# test_project_view()
