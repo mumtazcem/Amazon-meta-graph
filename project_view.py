@@ -10,6 +10,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
+from datetime import datetime
+import os
 
 
 def er_random_graph_generator(n, p, ng, seed, w_base, w_top):
@@ -75,27 +77,37 @@ convert_graph_to_adjecency_matrix = lambda G: nx.to_numpy_matrix(G)
 
 convert_adjecency_matrix_to_graph = lambda adjecency_matrix: nx.from_numpy_matrix(adjecency_matrix)
 
+def create_directory_if_not_exist(folder_name):
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    
 def show_adjacency_matrix_from_graph(G):
     adjacency_matrix = convert_graph_to_adjecency_matrix(G)
     plt.imshow(adjacency_matrix)
     plt.colorbar()
     plt.title("Adjacency matrix")
+    create_directory_if_not_exist('figures')
+    plt.savefig('figures/adjacency_matrix_' + datetime.now().strftime("%H_%M_%S") + '.png')
     plt.show()
-
+    
 def show_adjacency_matrix(adjacency_matrix):
     plt.imshow(adjacency_matrix)
     plt.colorbar()
     plt.title("Adjacency matrix")
+    create_directory_if_not_exist('figures')
+    plt.savefig('figures/adjacency_matrix_' + datetime.now().strftime("%H_%M_%S") + '.png')
     plt.show()
-
+    
 def plot_degree_dist(G):
     degrees = [G.degree(n) for n in G.nodes()]
     plt.hist(degrees)
     plt.xlabel("degree")
     plt.ylabel("count")
     plt.title("Degree histogram")
+    create_directory_if_not_exist('figures')
+    plt.savefig('figures/histogram_' + datetime.now().strftime("%H_%M_%S") + '.png')
     plt.show()
-
+    
 def get_nodes_and_edges_number(G):
     return (G.number_of_nodes(), G.number_of_edges())
 
