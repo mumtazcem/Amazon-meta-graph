@@ -2,6 +2,10 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import project_view as pv
+import time
+
+start_time = time.time()
+print("Started...")
 
 g1_file = "g1Db.csv"
 g2_file = "g2Db.csv"
@@ -10,7 +14,7 @@ g1 = pd.read_csv(g1_file)
 g2 = pd.read_csv(g2_file)
 
 # filter out nodes below threshold, because it takes a lot of time. 3000 finishes fast
-threshold = 5000
+threshold = 3000
 g1 = g1[g1['nodeId'] < threshold]
 g2 = g2[g2['nodeId'] < threshold]
 
@@ -48,11 +52,15 @@ if run_G1:
                         adj_1[x][y] = weight
     G1 = nx.from_numpy_matrix(adj_1)
     num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G1)
-    print(num_of_nodes, num_of_edges)
+    print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
     pv.show_adjacency_matrix(adj_1)
     pv.show_adjacency_matrix_from_graph(G1)
     pv.draw_networkx_graph(G1)
     pv.plot_degree_dist(G1)
+
+g1_time = time.time()
+print("G1 is finished in --- %s seconds ---" % (g1_time - start_time))
+
 
 if run_G2:
     print("Running G2")
@@ -80,8 +88,14 @@ if run_G2:
 
     G2 = nx.from_numpy_matrix(adj_2)
     num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G2)
-    print(num_of_nodes, num_of_edges)
+    print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
     pv.show_adjacency_matrix(adj_2)
     pv.show_adjacency_matrix_from_graph(G2)
     pv.draw_networkx_graph(G2)
     pv.plot_degree_dist(G2)
+
+g2_time = time.time()
+print("G2 is finished --- %s seconds ---" % (g2_time - g1_time))
+
+
+print("All finished in %s seconds." % (time.time() - start_time))
