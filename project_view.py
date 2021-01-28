@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import random
 from datetime import datetime
 import os
+from collections import OrderedDict, Counter
 
 
 def er_random_graph_generator(n, p, ng, seed, w_base, w_top):
@@ -99,8 +100,12 @@ def show_adjacency_matrix(adjacency_matrix):
     plt.show()
     
 def plot_degree_dist(G):
-    degrees = [G.degree(n) for n in G.nodes()]
-    plt.hist(degrees)
+    degrees = dict(Counter(list(map(lambda x: G.degree(x), G.nodes()))))
+    degrees = OrderedDict(sorted(degrees.items()))
+    plt.figure(figsize=(15, 10))
+    keys = list(map(lambda x: str(x), degrees.keys()))
+    plt.bar(keys, degrees.values())
+    plt.xticks([keys[0], keys[-1]], visible=True)
     plt.xlabel("degree")
     plt.ylabel("count")
     plt.title("Degree histogram")
