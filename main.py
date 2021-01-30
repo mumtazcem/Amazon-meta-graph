@@ -2,9 +2,27 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import project_view as pv
+import networkx.algorithms.community as nx_comm
+import random
+import time
 
-adj1_file = "saved_adj_matrices/adj1_full.csv"
-adj2_file = "saved_adj_matrices/adj2_full.csv"
+# Most Crowded Modules would be saved to..
+g1_modules_file = "most_crowded_modules/g1_module_asin.csv"
+g2_modules_file = "most_crowded_modules/g2_module_asin.csv"
+
+# Database
+g1_pd = "saved_dataframes/g1Db.csv"
+g2_pd = "saved_dataframes/g2Db.csv"
+g1_db = pd.read_csv(g1_pd)
+g2_db = pd.read_csv(g2_pd)
+
+# Full
+# adj1_file = "saved_adj_matrices/adj1_full.csv"
+# adj2_file = "saved_adj_matrices/adj2_full.csv"
+
+# Thresholded
+adj1_file = "saved_adj_matrices/adj1_1k.csv"
+adj2_file = "saved_adj_matrices/adj2_1k.csv"
 
 adj_1_pd = pd.read_csv(adj1_file)
 adj_2_pd = pd.read_csv(adj2_file)
@@ -27,5 +45,112 @@ pv.plot_degree_dist(G1)
 
 num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G2)
 print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
-np.savetxt(adj2_file, adj_2, fmt='%d', delimiter=",")
 pv.plot_degree_dist(G2)
+
+
+# Modified Girvan-Newman algorithm
+def modified_girvan_newman_algorithm(g):
+    initial = nx_comm.modularity(g, [set(g.nodes)])
+    max_modularity = initial
+    saved_components = []
+    saved_graph = nx.Graph()
+    while g.number_of_edges() != 0:
+        centralities = nx.edge_betweenness_centrality(g)
+        # max() returns one of the edges with maximum centrality
+        u, v = max(centralities, key=centralities.get)
+        # Checking for same maximum centrality score below
+        if len(sorted(centralities.values(), reverse=True)) > 2:
+            centrality_max1 = sorted(centralities.values(), reverse=True)[0]
+            centrality_max2 = sorted(centralities.values(), reverse=True)[1]
+            if centrality_max1 == centrality_max2:
+                # At least two equal max centrality measure detected!
+                same_scores = []
+                for centrality in centralities:
+                    if centralities[centrality] == centrality_max1:
+                        same_scores.append(centrality)
+                # Pick an edge randomly among same scores
+                u, v = random.choice(same_scores)
+        # same score check finishes.
+        components = sorted(nx.connected_components(g), key=len, reverse=True)
+        if len(components) > 1:
+            fragmented_modularity = nx_comm.modularity(g, components)
+            if fragmented_modularity > max_modularity:
+                max_modularity = fragmented_modularity
+                saved_components = components
+                saved_graph = g.copy()
+        g.remove_edge(u, v)
+    return max_modularity, saved_components, saved_graph
+
+
+def most_crowded_module(all_components):
+    max_len = 0
+    most_crowded_modules = []
+    for component in all_components:
+        if max_len < len(component):
+            max_len = len(component)
+    for component in all_components:
+        if max_len == len(component):
+            most_crowded_modules.append(component)
+    return max_len, most_crowded_modules
+
+
+# Gets two graphs, runs Girvan Newman algorithm
+# Finds connected components. Among connected components,
+# it would print out the most crowded connected components
+# to csv files under most_crowded_modules folder.
+def modularity_calculations(G1, G2):
+    start_time = time.time()
+    print("******   Modularity Calculation Started   ******")
+    print("Running G1")
+    result_modularity, result_components, result_graph = modified_girvan_newman_algorithm(G1)
+    print("Final modularity: ", result_modularity)
+    print("Connected components of the graph with maximum modularity: ", result_components)
+    g1_max_len, g1_most_crowded_modules = most_crowded_module(result_components)
+    print("most_crowded_module include : ", g1_max_len, " nodes.")
+    print("most_crowded_modules: ", g1_most_crowded_modules)
+    # pv.draw_networkx_graph(result_graph)
+
+    g1_time = time.time()
+    print("G1 modularity is finished in --- %s seconds ---" % (g1_time - start_time))
+
+    print("Running G2")
+    result_modularity, result_components, result_graph = modified_girvan_newman_algorithm(G2)
+    print("Final modularity: ", result_modularity)
+    print("Connected components of the graph with maximum modularity: ", result_components)
+    g2_max_len, g2_most_crowded_modules = most_crowded_module(result_components)
+    print("most_crowded_module include : ", g2_max_len, " nodes.")
+    print("most_crowded_modules: ", g2_most_crowded_modules)
+    # pv.draw_networkx_graph(most_crowded_modules)
+
+    g2_time = time.time()
+    print("G2 is finished --- %s seconds ---" % (g2_time - g1_time))
+    print("Modularity finished in %s seconds." % (time.time() - start_time))
+    print("******   Modularity Calculation Ended   ******")
+
+    print("One of the most crowded module in G1..")
+
+    g1_modules_asin = []
+    for module_ in g1_most_crowded_modules:
+        module_asin = []
+        for product in module_:
+            module = g1_db[g1_db['nodeId'] == product]
+            module_asin.append(module['ASIN'].iat[0])
+        g1_modules_asin.append(module_asin)
+    with open(g1_modules_file, 'w', newline='') as myfile:
+        df = pd.DataFrame(g1_modules_asin)
+        df.to_csv(g1_modules_file)
+
+    print("One of the most crowded module in G2..")
+    g2_modules_asin = []
+    for module_ in g2_most_crowded_modules:
+        module_asin = []
+        for product in module_:
+            module = g2_db[g2_db['nodeId'] == product]
+            module_asin.append(module['ASIN'].iat[0])
+        g2_modules_asin.append(module_asin)
+    with open(g2_modules_file, 'w', newline='') as myfile:
+        df = pd.DataFrame(g2_modules_asin)
+        df.to_csv(g2_modules_file)
+
+
+modularity_calculations(G1, G2)
