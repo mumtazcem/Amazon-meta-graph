@@ -1,0 +1,29 @@
+import pandas as pd
+import numpy as np
+import networkx as nx
+import project_view as pv
+
+adj1_file = "saved_adj_matrices/adj1_full.csv"
+adj2_file = "saved_adj_matrices/adj2_full.csv"
+
+adj_1_pd = pd.read_csv(adj1_file)
+adj_2_pd = pd.read_csv(adj2_file)
+
+adj_1_pd.drop(adj_1_pd.columns[0], axis=1, inplace=True)
+adj_2_pd.drop(adj_2_pd.columns[0], axis=1, inplace=True)
+
+adj_1 = adj_1_pd.to_numpy()
+adj_2 = adj_2_pd.to_numpy()
+
+
+G1 = nx.from_numpy_matrix(adj_1)
+G2 = nx.from_numpy_matrix(adj_2)
+
+num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G1)
+print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
+pv.plot_degree_dist(G1)
+
+num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G2)
+print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
+np.savetxt(adj2_file, adj_2, fmt='%d', delimiter=",")
+pv.plot_degree_dist(G2)

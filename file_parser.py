@@ -20,7 +20,7 @@ def main():
 
     dataFrameType = 1  # 1 : one dataframe; 2 : two dataframe
     selectedGroup1 = 'Video'
-    selectedGroup2 = 'Music'
+    selectedGroup2 = 'DVD'
 
     g1IdList = []  # ID of selectedGroup1 products
     g1PrList = []
@@ -115,7 +115,8 @@ def main():
     g1Db = pd.DataFrame.from_dict(g1PrList)
     # insert nodeID column
     num_of_nodes1, col1 = g1Db.shape
-    # TODO: make this line below work, yet it does not run since g1Db['totalSimilar'] is str
+    # TODO: in case we need to focus only nodes that have edges
+    #  make this line below work, yet it does not run since g1Db['totalSimilar'] is str
     # g1Db = g1Db[g1Db['totalSimilar'] > 0]
     g1Db.insert(0, "nodeId", np.full((num_of_nodes1,), range(num_of_nodes1)), True)
     with open(graph1_df_file, 'w', newline='') as myfile:
@@ -124,7 +125,8 @@ def main():
     g2Db = pd.DataFrame.from_dict(g2PrList)
     # insert nodeID column
     num_of_nodes2, col2 = g2Db.shape
-    # TODO: make this line below work, yet it does not run since g1Db['totalSimilar'] is str
+    # TODO: in case we need to focus only nodes that have edges
+    #  make this line below work, yet it does not run since g1Db['totalSimilar'] is str
     # g2Db = g2Db[g2Db['totalSimilar'] > 0]
     g2Db.insert(0, "nodeId", np.full((num_of_nodes2,), range(num_of_nodes2)), True)
     with open(graph2_df_file, 'w', newline='') as myfile:
