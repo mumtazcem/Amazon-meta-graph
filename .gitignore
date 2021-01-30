@@ -11,3 +11,5 @@ amazon-meta.txt
 database.csv
 __pycache__/
 figures/
+saved_adj_matrices/adj1_full.csv
+saved_adj_matrices/adj2_full.csv
