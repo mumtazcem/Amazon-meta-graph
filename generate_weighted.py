@@ -7,16 +7,21 @@ import time
 start_time = time.time()
 print("Started...")
 
-g1_file = "g1Db.csv"
-g2_file = "g2Db.csv"
+# to be read from
+g1_file = "saved_dataframes/g1Db.csv"
+g2_file = "saved_dataframes/g2Db.csv"
+
+# to be written to
+adj1_file = "saved_adj_matrices/adj1_full.csv"
+adj2_file = "saved_adj_matrices/adj2_full.csv"
 
 g1 = pd.read_csv(g1_file)
 g2 = pd.read_csv(g2_file)
 
 # filter out nodes below threshold, because it takes a lot of time. 3000 finishes fast
-threshold = 3000
-g1 = g1[g1['nodeId'] < threshold]
-g2 = g2[g2['nodeId'] < threshold]
+# threshold = 3000
+# g1 = g1[g1['nodeId'] < threshold]
+# g2 = g2[g2['nodeId'] < threshold]
 
 n1, col1 = g1.shape
 n2, col2 = g2.shape
@@ -25,7 +30,7 @@ adj_1 = np.zeros((n1, n1), dtype=int)
 adj_2 = np.zeros((n2, n2), dtype=int)
 
 run_G1 = True
-run_G2 = False
+run_G2 = True
 
 if run_G1:
     print("Running G1")
@@ -53,9 +58,10 @@ if run_G1:
     G1 = nx.from_numpy_matrix(adj_1)
     num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G1)
     print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
-    pv.show_adjacency_matrix(adj_1)
-    pv.show_adjacency_matrix_from_graph(G1)
-    pv.draw_networkx_graph(G1)
+    pd.DataFrame(adj_1).to_csv(adj1_file)
+    # pv.show_adjacency_matrix(adj_1)
+    # pv.show_adjacency_matrix_from_graph(G1)
+    # pv.draw_networkx_graph(G1)
     pv.plot_degree_dist(G1)
 
 g1_time = time.time()
@@ -89,9 +95,10 @@ if run_G2:
     G2 = nx.from_numpy_matrix(adj_2)
     num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G2)
     print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
-    pv.show_adjacency_matrix(adj_2)
-    pv.show_adjacency_matrix_from_graph(G2)
-    pv.draw_networkx_graph(G2)
+    pd.DataFrame(adj_2).to_csv(adj2_file)
+    # pv.show_adjacency_matrix(adj_2)
+    # pv.show_adjacency_matrix_from_graph(G2)
+    # pv.draw_networkx_graph(G2)
     pv.plot_degree_dist(G2)
 
 g2_time = time.time()
