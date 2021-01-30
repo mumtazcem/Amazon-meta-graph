@@ -84,7 +84,7 @@ def create_directory_if_not_exist(folder_name):
     
 def show_adjacency_matrix_from_graph(G):
     adjacency_matrix = convert_graph_to_adjecency_matrix(G)
-    plt.imshow(adjacency_matrix)
+    plt.imshow(adjacency_matrix, cmap=plt.get_cmap('binary'))
     plt.colorbar()
     plt.title("Adjacency matrix")
     create_directory_if_not_exist('figures')
@@ -92,7 +92,7 @@ def show_adjacency_matrix_from_graph(G):
     plt.show()
     
 def show_adjacency_matrix(adjacency_matrix):
-    plt.imshow(adjacency_matrix)
+    plt.imshow(adjacency_matrix, cmap=plt.get_cmap('binary'))
     plt.colorbar()
     plt.title("Adjacency matrix")
     create_directory_if_not_exist('figures')
@@ -105,7 +105,8 @@ def plot_degree_dist(G):
     plt.figure(figsize=(15, 10))
     keys = list(map(lambda x: str(x), degrees.keys()))
     plt.bar(keys, degrees.values())
-    plt.xticks([keys[0], keys[-1]], visible=True)
+    for a,b in enumerate(degrees.values()):
+        plt.text(a, b, str(b), horizontalalignment='center')
     plt.xlabel("degree")
     plt.ylabel("count")
     plt.title("Degree histogram")
