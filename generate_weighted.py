@@ -36,19 +36,20 @@ if run_G1:
     print("Running G1")
     idDict = {}
     j = 0
-    for i in g2['Id']:
+    for i in g1['Id']:
         idDict[i] = j
         j = j +1
     for index, row in g1.iterrows():
         for i in range(5):
             # similarity_indices: s1, s2, s3, s4 ,s5
             similarity_index = "s" + str(i + 1)
+            vote_index = "v" + str(i + 1)
             similar_product_asin = row[similarity_index]
             # if the similar cell is null
             if np.isnan(row[similarity_index]):
                 continue
             # if no weight is assigned
-             x = idDict.get(row['Id'])
+            x = idDict.get(row['Id'])
             y = idDict.get(row[similarity_index])
             if adj_1[x][y] == 0:
                 # sum both products' totalVote values
