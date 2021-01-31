@@ -7,22 +7,28 @@ import random
 import time
 
 # Most Crowded Modules would be saved to..
-g1_modules_file = "most_crowded_modules/g1_module_asin.csv"
-g2_modules_file = "most_crowded_modules/g2_module_asin.csv"
+g1_modules_file = "most_crowded_modules/g1_module_min.csv"
+g2_modules_file = "most_crowded_modules/g2_module_min.csv"
+
+# Page Ranks would be saved to..
+g1_pagerank_file = "page_ranks/g1_pagerank_file.csv"
+g2_pagerank_file = "page_ranks/g2_pagerank_file.csv"
 
 # Database
-g1_pd = "saved_dataframes/g1Db.csv"
-g2_pd = "saved_dataframes/g2Db.csv"
+g1_pd = "saved_dataframes/g1Db_clean.csv"
+g2_pd = "saved_dataframes/g2Db_clean.csv"
 g1_db = pd.read_csv(g1_pd)
 g2_db = pd.read_csv(g2_pd)
 
-# Full
-# adj1_file = "saved_adj_matrices/adj1_full.csv"
-# adj2_file = "saved_adj_matrices/adj2_full.csv"
+# Fix nodeId column
+num_of_nodes1, col1 = g1_db.shape
+g1_db['nodeId'] = np.full((num_of_nodes1,), range(num_of_nodes1))
+num_of_nodes2, col2 = g2_db.shape
+g2_db['nodeId'] = np.full((num_of_nodes2,), range(num_of_nodes2))
 
 # Thresholded
-adj1_file = "saved_adj_matrices/adj1_1k.csv"
-adj2_file = "saved_adj_matrices/adj2_1k.csv"
+adj1_file = "saved_adj_matrices/adj1_min.csv"
+adj2_file = "saved_adj_matrices/adj2_min.csv"
 
 adj_1_pd = pd.read_csv(adj1_file)
 adj_2_pd = pd.read_csv(adj2_file)
@@ -153,4 +159,31 @@ def modularity_calculations(G1, G2):
         df.to_csv(g2_modules_file)
 
 
-modularity_calculations(G1, G2)
+def page_rank_calculations(G1, G2):
+    # G1
+    pr = nx.pagerank(G1, alpha=0.9, max_iter=1000, weight='weight')
+    sorted_pr = {k: v for k, v in sorted(pr.items(), key=lambda item: item[1], reverse=True)}
+    print(sorted_pr)
+    pr_df = pd.DataFrame.from_dict(sorted_pr, orient='index')
+    pr_df["ASIN"] = ""
+    for index, row in pr_df.iterrows():
+        product = g1_db[g1_db['nodeId'] == index]
+        pr_df.at[index, 'ASIN'] = product['ASIN'].iat[0]
+    with open(g1_pagerank_file, 'w', newline='') as myfile:
+        pr_df.to_csv(g1_pagerank_file)
+
+    # G2
+    pr = nx.pagerank(G2, alpha=0.9, max_iter=1000, weight='weight')
+    sorted_pr = {k: v for k, v in sorted(pr.items(), key=lambda item: item[1], reverse=True)}
+    print(sorted_pr)
+    pr_df = pd.DataFrame.from_dict(sorted_pr, orient='index')
+    pr_df["ASIN"] = ""
+    for index, row in pr_df.iterrows():
+        product = g2_db[g2_db['nodeId'] == index]
+        pr_df.at[index, 'ASIN'] = product['ASIN'].iat[0]
+    with open(g2_pagerank_file, 'w', newline='') as myfile:
+        pr_df.to_csv(g2_pagerank_file)
+
+
+page_rank_calculations(G1, G2)
+# modularity_calculations(G1, G2)
