@@ -90,7 +90,7 @@ def show_adjacency_matrix_from_graph(G):
     create_directory_if_not_exist('figures')
     plt.savefig('figures/adjacency_matrix_' + datetime.now().strftime("%H_%M_%S") + '.png')
     plt.show()
-    
+
 def show_adjacency_matrix(adjacency_matrix):
     plt.imshow(adjacency_matrix, cmap=plt.get_cmap('binary'))
     plt.colorbar()
@@ -98,6 +98,32 @@ def show_adjacency_matrix(adjacency_matrix):
     create_directory_if_not_exist('figures')
     plt.savefig('figures/adjacency_matrix_' + datetime.now().strftime("%H_%M_%S") + '.png')
     plt.show()
+
+def plot_strength_distribution(G):
+    nodes_with_weights = G.degree(weight='weight')
+    ids = list(map(lambda x: x[0], nodes_with_weights))
+    values = list(map(lambda x: x[1], nodes_with_weights))
+    plt.bar(ids, values)
+    plt.show()
+
+def plot_differences_with_strenght_distribution(G1, G2, in_one):
+    nodes_with_weights1 = G1.degree(weight='weight')
+    ids1 = list(map(lambda x: x[0], nodes_with_weights1))
+    values1 = list(map(lambda x: x[1], nodes_with_weights1))
+    nodes_with_weights2 = G2.degree(weight='weight')
+    ids2 = list(map(lambda x: x[0], nodes_with_weights2))
+    values2 = list(map(lambda x: x[1], nodes_with_weights2))
+    if in_one:
+        plt.title("Strength distributions of graphs G1 and G2")
+        plt.bar(ids1, values1)
+        plt.bar(ids2, values2)
+        plt.show()
+    else:
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        fig.suptitle("Strength distributions of graphs G1 and G2")
+        ax1.bar(ids1, values1)
+        ax2.bar(ids2, values2)
+        plt.show()    
     
 def plot_degree_dist(G):
     degrees = dict(Counter(list(map(lambda x: G.degree(x), G.nodes()))))
