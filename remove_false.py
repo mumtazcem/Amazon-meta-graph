@@ -44,7 +44,7 @@ if run_G1:
                 visitedIndex = list(similar_product_row['visited'] .to_dict())[0]
                 g1.at[visitedIndex, 'visited'] = g1.at[visitedIndex, 'visited'] + 1
                 g1.at[index, 'visited'] = g1.at[index, 'visited'] + 1
-                g1.at[index, similarity_index] = (similar_product_row['Id'])
+                g1.at[index, similarity_index] = int(similar_product_row['Id'])
                 g1.at[index, vote_index] = int(similar_product_row['totalVote'])
                 
         totalSimilar = row['totalSimilar'] - len(removeS)
