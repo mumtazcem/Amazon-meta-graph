@@ -6,9 +6,12 @@ import networkx.algorithms.community as nx_comm
 import random
 import time
 
+# Seed value for betweenness centrality and for random choices
+seed = 900
+
 # Most Crowded Modules would be saved to..
-g1_modules_file = "most_crowded_modules/g1_module_min.csv"
-g2_modules_file = "most_crowded_modules/g2_module_min.csv"
+g1_modules_file = "most_crowded_modules/g1_modules.csv"
+g2_modules_file = "most_crowded_modules/g2_modules.csv"
 
 # Page Ranks would be saved to..
 g1_pagerank_file = "page_ranks/g1_pagerank_file.csv"
@@ -47,21 +50,21 @@ G2 = nx.from_numpy_matrix(adj_2)
 
 num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G1)
 print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
-pv.plot_degree_dist(G1)
+# pv.plot_degree_dist(G1)
 
 num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G2)
 print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
-pv.plot_degree_dist(G2)
+# pv.plot_degree_dist(G2)
 
 
-# Modified Girvan-Newman algorithm
+# Modified Girvan-Newman algorithm from HW3
 def modified_girvan_newman_algorithm(g):
-    initial = nx_comm.modularity(g, [set(g.nodes)])
+    initial = nx_comm.modularity(g, [set(g.nodes)], weight='weight')
     max_modularity = initial
     saved_components = []
     saved_graph = nx.Graph()
     while g.number_of_edges() != 0:
-        centralities = nx.edge_betweenness_centrality(g)
+        centralities = nx.edge_betweenness_centrality(g, weight='weight', seed=seed)
         # max() returns one of the edges with maximum centrality
         u, v = max(centralities, key=centralities.get)
         # Checking for same maximum centrality score below
@@ -75,11 +78,11 @@ def modified_girvan_newman_algorithm(g):
                     if centralities[centrality] == centrality_max1:
                         same_scores.append(centrality)
                 # Pick an edge randomly among same scores
-                u, v = random.choice(same_scores)
+                u, v = random.Random(seed).choice(same_scores)
         # same score check finishes.
         components = sorted(nx.connected_components(g), key=len, reverse=True)
         if len(components) > 1:
-            fragmented_modularity = nx_comm.modularity(g, components)
+            fragmented_modularity = nx_comm.modularity(g, components, weight='weight')
             if fragmented_modularity > max_modularity:
                 max_modularity = fragmented_modularity
                 saved_components = components
@@ -108,10 +111,10 @@ def modularity_calculations(G1, G2):
     start_time = time.time()
     print("******   Modularity Calculation Started   ******")
     print("Running G1")
-    result_modularity, result_components, result_graph = modified_girvan_newman_algorithm(G1)
+    result_modularity, g1_result_components, result_graph = modified_girvan_newman_algorithm(G1)
     print("Final modularity: ", result_modularity)
-    print("Connected components of the graph with maximum modularity: ", result_components)
-    g1_max_len, g1_most_crowded_modules = most_crowded_module(result_components)
+    print("Connected components of the graph with maximum modularity: ", g1_result_components)
+    g1_max_len, g1_most_crowded_modules = most_crowded_module(g1_result_components)
     print("most_crowded_module include : ", g1_max_len, " nodes.")
     print("most_crowded_modules: ", g1_most_crowded_modules)
     # pv.draw_networkx_graph(result_graph)
@@ -120,43 +123,60 @@ def modularity_calculations(G1, G2):
     print("G1 modularity is finished in --- %s seconds ---" % (g1_time - start_time))
 
     print("Running G2")
-    result_modularity, result_components, result_graph = modified_girvan_newman_algorithm(G2)
+    result_modularity, g2_result_components, result_graph = modified_girvan_newman_algorithm(G2)
     print("Final modularity: ", result_modularity)
-    print("Connected components of the graph with maximum modularity: ", result_components)
-    g2_max_len, g2_most_crowded_modules = most_crowded_module(result_components)
+    print("Connected components of the graph with maximum modularity: ", g2_result_components)
+    g2_max_len, g2_most_crowded_modules = most_crowded_module(g2_result_components)
     print("most_crowded_module include : ", g2_max_len, " nodes.")
     print("most_crowded_modules: ", g2_most_crowded_modules)
-    # pv.draw_networkx_graph(most_crowded_modules)
+    # pv.draw_networkx_graph(result_graph)
 
     g2_time = time.time()
     print("G2 is finished --- %s seconds ---" % (g2_time - g1_time))
     print("Modularity finished in %s seconds." % (time.time() - start_time))
     print("******   Modularity Calculation Ended   ******")
 
-    print("One of the most crowded module in G1..")
-
+    print("Printing modules of G1..")
     g1_modules_asin = []
-    for module_ in g1_most_crowded_modules:
+    for module_ in g1_result_components:
         module_asin = []
         for product in module_:
             module = g1_db[g1_db['nodeId'] == product]
             module_asin.append(module['ASIN'].iat[0])
         g1_modules_asin.append(module_asin)
-    with open(g1_modules_file, 'w', newline='') as myfile:
-        df = pd.DataFrame(g1_modules_asin)
-        df.to_csv(g1_modules_file)
+    df1 = pd.DataFrame(g1_modules_asin)
 
-    print("One of the most crowded module in G2..")
+    # the number of nodes in the corresponding module
+    df1['NumberOfNodes'] = ""
+    for row_index, row in df1.iterrows():
+        node_counter = 0
+        for column in row:
+            if column is not None:
+                node_counter += 1
+        df1.at[row_index, 'NumberOfNodes'] = node_counter - 1
+    with open(g1_modules_file, 'w', newline='') as myfile:
+        df1.to_csv(g1_modules_file)
+
+    print("Printing modules of G2..")
     g2_modules_asin = []
-    for module_ in g2_most_crowded_modules:
+    for module_ in g2_result_components:
         module_asin = []
         for product in module_:
             module = g2_db[g2_db['nodeId'] == product]
             module_asin.append(module['ASIN'].iat[0])
         g2_modules_asin.append(module_asin)
+    df2 = pd.DataFrame(g2_modules_asin)
+    # the number of nodes in the corresponding module
+    df2['NumberOfNodes'] = ""
+    for row_index, row in df2.iterrows():
+        node_counter = 0
+        for column in row:
+            if column is not None:
+                node_counter += 1
+        df2.at[row_index, 'NumberOfNodes'] = node_counter - 1  # minus 1 because of NumberOfNodes column
     with open(g2_modules_file, 'w', newline='') as myfile:
-        df = pd.DataFrame(g2_modules_asin)
-        df.to_csv(g2_modules_file)
+        df2.to_csv(g2_modules_file)
+    return df1, df2
 
 
 def page_rank_calculations(G1, G2):
@@ -164,26 +184,64 @@ def page_rank_calculations(G1, G2):
     pr = nx.pagerank(G1, alpha=0.9, max_iter=1000, weight='weight')
     sorted_pr = {k: v for k, v in sorted(pr.items(), key=lambda item: item[1], reverse=True)}
     print(sorted_pr)
-    pr_df = pd.DataFrame.from_dict(sorted_pr, orient='index')
-    pr_df["ASIN"] = ""
-    for index, row in pr_df.iterrows():
+    g1_pr_df = pd.DataFrame.from_dict(sorted_pr, orient='index')
+    g1_pr_df["ASIN"] = ""
+    for index, row in g1_pr_df.iterrows():
         product = g1_db[g1_db['nodeId'] == index]
-        pr_df.at[index, 'ASIN'] = product['ASIN'].iat[0]
-    with open(g1_pagerank_file, 'w', newline='') as myfile:
-        pr_df.to_csv(g1_pagerank_file)
+        g1_pr_df.at[index, 'ASIN'] = product['ASIN'].iat[0]
 
     # G2
     pr = nx.pagerank(G2, alpha=0.9, max_iter=1000, weight='weight')
     sorted_pr = {k: v for k, v in sorted(pr.items(), key=lambda item: item[1], reverse=True)}
     print(sorted_pr)
-    pr_df = pd.DataFrame.from_dict(sorted_pr, orient='index')
-    pr_df["ASIN"] = ""
-    for index, row in pr_df.iterrows():
+    g2_pr_df = pd.DataFrame.from_dict(sorted_pr, orient='index')
+    g2_pr_df["ASIN"] = ""
+    for index, row in g2_pr_df.iterrows():
         product = g2_db[g2_db['nodeId'] == index]
-        pr_df.at[index, 'ASIN'] = product['ASIN'].iat[0]
-    with open(g2_pagerank_file, 'w', newline='') as myfile:
-        pr_df.to_csv(g2_pagerank_file)
+        g2_pr_df.at[index, 'ASIN'] = product['ASIN'].iat[0]
+    return g1_pr_df, g2_pr_df
 
 
-page_rank_calculations(G1, G2)
-# modularity_calculations(G1, G2)
+# Searches over modules, finds the corresponding module for the input ASIN
+def search_modules(modules_dataframe, input_asin):
+    for index, row in modules_dataframe.iterrows():
+        for column_asin in row:
+            if column_asin == input_asin:
+                return index, modules_dataframe.at[index, 'NumberOfNodes']
+
+
+# Given pagerank and modularity, this method would create the R space that includes
+# node's
+# ID
+# PageRank
+# ASIN
+# Module degree
+# Module that it belongs to
+def create_relationship_space(graph_pagerank, graph_modularity):
+    # Add module degree column. Module degree represents the number of nodes in the module that this node belongs to
+    graph_pagerank["ModuleDegree"] = ""
+    # Given pagerank find its corresponding module ID that this node belongs to
+    graph_pagerank["BelongsTo"] = ""
+    for index, row in graph_pagerank.iterrows():
+        product_asin = graph_pagerank.at[index, 'ASIN']
+        # search over modules
+        module_index, module_degree = search_modules(graph_modularity, product_asin)
+        graph_pagerank.at[index, 'BelongsTo'] = module_index
+        graph_pagerank.at[index, 'ModuleDegree'] = module_degree
+
+    return graph_pagerank
+
+
+# Calculate pagerank and modules
+g1_pagerank, g2_pagerank = page_rank_calculations(G1, G2)
+g1_modularity, g2_modularity = modularity_calculations(G1, G2)
+
+# Create the R space
+g1_relationship = create_relationship_space(g1_pagerank, g1_modularity)
+g2_relationship = create_relationship_space(g2_pagerank, g2_modularity)
+
+# Write to a file
+with open(g1_pagerank_file, 'w', newline='') as myfile:
+    g1_relationship.to_csv(g1_pagerank_file)
+with open(g2_pagerank_file, 'w', newline='') as myfile:
+    g2_relationship.to_csv(g2_pagerank_file)
