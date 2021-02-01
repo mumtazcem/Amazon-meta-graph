@@ -114,13 +114,13 @@ def plot_differences_with_strenght_distribution(G1, G2, in_one):
     ids2 = list(map(lambda x: x[0], nodes_with_weights2))
     values2 = list(map(lambda x: x[1], nodes_with_weights2))
     if in_one:
-        plt.title("Strength distributions of graphs G1 and G2")
+        plt.title("Strength distributions of graphs")
         plt.bar(ids1, values1)
         plt.bar(ids2, values2)
         plt.show()
     else:
         fig, (ax1, ax2) = plt.subplots(1, 2)
-        fig.suptitle("Strength distributions of graphs G1 and G2")
+        fig.suptitle("Strength distributions of graphs")
         ax1.bar(ids1, values1)
         ax2.bar(ids2, values2)
         plt.show()    
