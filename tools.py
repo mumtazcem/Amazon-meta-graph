@@ -2,7 +2,8 @@ import random
 import pandas as pd
 import networkx as nx
 from main import page_rank_calculations, modularity_calculations, create_relationship_space, morphospace_values
-
+import matplotlib as plt
+import numpy as np
 
 def randomize_graphs(G, number_of_new_graphs):
     new_graphs = []
@@ -54,19 +55,28 @@ adj_2 = adj_2_pd.to_numpy()
 G1 = nx.from_numpy_matrix(adj_1)
 G2 = nx.from_numpy_matrix(adj_2)
 
-g1_random_graphs = randomize_graphs(G1, 1)
-g2_random_graphs = randomize_graphs(G2, 1)
+number_of_random_graphs = 100
+g1_random_graphs = randomize_graphs(G1, number_of_random_graphs)
+g2_random_graphs = randomize_graphs(G2, number_of_random_graphs)
 
-g1_pagerank, g2_pagerank =  page_rank_calculations(g1_random_graphs[0], g2_random_graphs[0])
-g1_modularity, g2_modularity =  modularity_calculations(g1_random_graphs[0], g2_random_graphs[0])
+mod_degrees_x_g1 = []
+mod_degrees_x_g2 = []
+page_ranks_y_g1 = []
+page_ranks_y_g2 = []
 
-g1_relationship = create_relationship_space(g1_pagerank, g1_modularity)
-g2_relationship =  create_relationship_space(g2_pagerank, g2_modularity)
+for g1, g2 in zip(g1_random_graphs, g2_random_graphs):
+    g1_pagerank, g2_pagerank =  page_rank_calculations(g1, g2)
+    g1_modularity, g2_modularity =  modularity_calculations(g1, g2)
 
-sum_page_rank1, mod_degree1 =  morphospace_values(g1_pagerank, g1_modularity)
-sum_page_rank2, mod_degree2 =  morphospace_values(g2_pagerank, g2_modularity)
+    g1_relationship = create_relationship_space(g1_pagerank, g1_modularity)
+    g2_relationship =  create_relationship_space(g2_pagerank, g2_modularity)
 
-print(sum_page_rank1)
-print(mod_degree1)
-print(sum_page_rank2)
-print(mod_degree2)
+    sum_page_rank1, mod_degree1 =  morphospace_values(g1_pagerank, g1_modularity)
+    sum_page_rank2, mod_degree2 =  morphospace_values(g2_pagerank, g2_modularity)
+
+    mod_degrees_x_g1.append(mod_degree1)
+    page_ranks_y_g1.append(sum_page_rank1)
+    mod_degrees_x_g2.append(mod_degree2)
+    page_ranks_y_g2.append(sum_page_rank2)
+
+plt.scatter(np.concatenate((mod_degrees_x_g1, mod_degrees_x_g2)), np.concatenate((page_ranks_y_g1, page_ranks_y_g2)), c= [0] * number_of_random_graphs + [1] * number_of_random_graphs)
