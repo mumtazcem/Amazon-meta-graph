@@ -1,26 +1,33 @@
 import random
 import pandas as pd
 import networkx as nx
-from main import page_rank_calculations, modularity_calculations, create_relationship_space, morphospace_values
-import matplotlib as plt
+from main import do_all_calculations, do_calculations_using_file
+import matplotlib.pyplot as plt
 import numpy as np
+
+# Seed value for betweenness centrality and for random choices
+seed = 900
+
 
 def randomize_graphs(G, number_of_new_graphs):
     new_graphs = []
     for graph_number in range(number_of_new_graphs):
         tmp_graph = G.copy()
         nodes_number = tmp_graph.number_of_nodes()
-        for i in range (nodes_number):
+        for i in range(nodes_number):
             # container for selected randomly, two existing, different edges
             selectedEdges = []
             while len(selectedEdges) < 2:
-                firstPartEdge = random.randrange(0, nodes_number - 1)
-                secondPartEdge = random.randrange(0, nodes_number - 1)
-                #checking if edge exist and if is not in selectdEdges
-                if tmp_graph.has_edge(firstPartEdge, secondPartEdge) and (firstPartEdge, secondPartEdge) not in selectedEdges and (secondPartEdge, firstPartEdge) not in selectedEdges:
+                firstPartEdge = random.Random(seed).randrange(0, nodes_number - 1)
+                secondPartEdge = random.Random(seed).randrange(0, nodes_number - 1)
+                # checking if edge exist and if is not in selectdEdges
+                if tmp_graph.has_edge(firstPartEdge, secondPartEdge) and (
+                        firstPartEdge, secondPartEdge) not in selectedEdges and (
+                        secondPartEdge, firstPartEdge) not in selectedEdges:
                     selectedEdges.append((firstPartEdge, secondPartEdge))
-            #check if new connection exist. If exist, skip and go to random new pair
-            if tmp_graph.has_edge(selectedEdges[0][0], selectedEdges[1][1]) or  tmp_graph.has_edge(selectedEdges[1][0],selectedEdges[0][1]):
+            # check if new connection exist. If exist, skip and go to random new pair
+            if tmp_graph.has_edge(selectedEdges[0][0], selectedEdges[1][1]) or tmp_graph.has_edge(selectedEdges[1][0],
+                                                                                                  selectedEdges[0][1]):
                 selectedEdges.clear()
                 continue
             edge_0_weight = tmp_graph.get_edge_data(*selectedEdges[0])['weight']
@@ -29,8 +36,8 @@ def randomize_graphs(G, number_of_new_graphs):
             tmp_graph.remove_edge(*selectedEdges[0])
             tmp_graph.remove_edge(*selectedEdges[1])
             # add new changed edges
-            tmp_graph.add_edge(selectedEdges[0][0],selectedEdges[1][1],  weight=edge_0_weight)
-            tmp_graph.add_edge(selectedEdges[1][0],selectedEdges[0][1],  weight=edge_1_weight)
+            tmp_graph.add_edge(selectedEdges[0][0], selectedEdges[1][1], weight=edge_0_weight)
+            tmp_graph.add_edge(selectedEdges[1][0], selectedEdges[0][1], weight=edge_1_weight)
             selectedEdges.clear()
         new_graphs.append(tmp_graph)
     return new_graphs
@@ -55,7 +62,7 @@ adj_2 = adj_2_pd.to_numpy()
 G1 = nx.from_numpy_matrix(adj_1)
 G2 = nx.from_numpy_matrix(adj_2)
 
-number_of_random_graphs = 100
+number_of_random_graphs = 1
 g1_random_graphs = randomize_graphs(G1, number_of_random_graphs)
 g2_random_graphs = randomize_graphs(G2, number_of_random_graphs)
 
@@ -63,20 +70,63 @@ mod_degrees_x_g1 = []
 mod_degrees_x_g2 = []
 page_ranks_y_g1 = []
 page_ranks_y_g2 = []
-
+# Real G1
+# 0.0026914075090193903
+# 6
+# Real G2
+# 0.002812468086869622
+# 7
+# Include G1 and G2
+mod_degrees_x_g1.append(6)
+mod_degrees_x_g2.append(7)
+page_ranks_y_g1.append(0.0026914075090193903)
+page_ranks_y_g2.append(0.002812468086869622)
 for g1, g2 in zip(g1_random_graphs, g2_random_graphs):
-    g1_pagerank, g2_pagerank =  page_rank_calculations(g1, g2)
-    g1_modularity, g2_modularity =  modularity_calculations(g1, g2)
-
-    g1_relationship = create_relationship_space(g1_pagerank, g1_modularity)
-    g2_relationship =  create_relationship_space(g2_pagerank, g2_modularity)
-
-    sum_page_rank1, mod_degree1 =  morphospace_values(g1_pagerank, g1_modularity)
-    sum_page_rank2, mod_degree2 =  morphospace_values(g2_pagerank, g2_modularity)
+    sum_page_rank1, mod_degree1, sum_page_rank2, mod_degree2 = do_all_calculations(g1, g2,
+                                                                                   file_mod1="random_graph_results/g1rand_modules2.csv",
+                                                                                   file_mod2="random_graph_results/g2rand_modules.csv",
+                                                                                   file_pr1="random_graph_results/g1rand_pr2.csv",
+                                                                                   file_pr2="random_graph_results/g2rand_pr2.csv")
 
     mod_degrees_x_g1.append(mod_degree1)
-    page_ranks_y_g1.append(sum_page_rank1)
+    page_ranks_y_g1.append(sum_page_rank1 / mod_degree1)
     mod_degrees_x_g2.append(mod_degree2)
-    page_ranks_y_g2.append(sum_page_rank2)
+    page_ranks_y_g2.append(sum_page_rank2 / mod_degree2)
 
-plt.scatter(np.concatenate((mod_degrees_x_g1, mod_degrees_x_g2)), np.concatenate((page_ranks_y_g1, page_ranks_y_g2)), c= [0] * number_of_random_graphs + [1] * number_of_random_graphs)
+data1 = {'ModuleDegrees': mod_degrees_x_g1,
+         'PageRank': page_ranks_y_g1}
+# Create DataFrame
+df1 = pd.DataFrame(data1)
+
+data2 = {'ModuleDegrees': mod_degrees_x_g2,
+         'PageRank': page_ranks_y_g2}
+# Create DataFrame
+df2 = pd.DataFrame(data2)
+
+g1_morhpospace_file = "random_graph_results/g1_morphospace_random.csv"
+g2_morhpospace_file = "random_graph_results/g2_morphospace_random.csv"
+
+
+with open(g1_morhpospace_file, 'w', newline='') as myfile:
+    df1.to_csv(g1_morhpospace_file)
+with open(g2_morhpospace_file, 'w', newline='') as myfile:
+    df2.to_csv(g2_morhpospace_file)
+
+
+# def create_morphospace_plot():
+#     g1_morp = g1_morhpospace_file
+#     g2_morp = g2_morhpospace_file
+#     g1 = pd.read_csv(g1_morp)
+#     g2 = pd.read_csv(g2_morp)
+#     mod_degrees_x_g1 = g1['ModuleDegrees'].tolist()
+#     mod_degrees_x_g2 = g2['ModuleDegrees'].tolist()
+#     page_ranks_y_g1 = g1['PageRank'].tolist()
+#     page_ranks_y_g2 = g2['PageRank'].tolist()
+#     plt.scatter(np.concatenate((mod_degrees_x_g1, mod_degrees_x_g2)),
+#                 np.concatenate((page_ranks_y_g1, page_ranks_y_g2)),
+#                 c=[0] * number_of_random_graphs + [1] * number_of_random_graphs)
+#     plt.savefig("plot.png")
+#     plt.show()
+#
+#
+# create_morphospace_plot()

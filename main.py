@@ -267,9 +267,9 @@ def do_calculations_using_file(file1_pr, file2_pr, file1_mod, file2_mod):
     # Get morphospace values for graphs
     sum_page_rank1, mod_degree1 = morphospace_values(g1_pagerank, g1_modularity, is_reading_from_file=True)
     sum_page_rank2, mod_degree2 = morphospace_values(g2_pagerank, g2_modularity, is_reading_from_file=True)
-    print(sum_page_rank1)
+    print(sum_page_rank1/mod_degree1)
     print(mod_degree1)
-    print(sum_page_rank2)
+    print(sum_page_rank2/mod_degree2)
     print(mod_degree2)
     return sum_page_rank1, mod_degree1, sum_page_rank2, mod_degree2
 
@@ -295,10 +295,10 @@ def do_all_calculations(G1, G2, file_mod1, file_mod2, file_pr1, file_pr2):
         g1_relationship.to_csv(g1_pagerank_file)
     with open(file_pr2, 'w', newline='') as myfile:
         g2_relationship.to_csv(g2_pagerank_file)
-
+    return sum_page_rank1, mod_degree1, sum_page_rank2, mod_degree2
 
 # Generate real G1 G2
-G1, G2 = generate_g1_g2()
-do_all_calculations(G1, G2, g1_modules_file, g2_modules_file, g1_pagerank_file, g2_pagerank_file)
+# G1, G2 = generate_g1_g2()
+# do_all_calculations(G1, G2, g1_modules_file, g2_modules_file, g1_pagerank_file, g2_pagerank_file)
 do_calculations_using_file(g1_pagerank_file, g2_pagerank_file, g1_modules_file, g2_modules_file)
 
