@@ -54,6 +54,8 @@ print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
 
 num_of_nodes, num_of_edges = pv.get_nodes_and_edges_number(G2)
 print("Number of nodes :", num_of_nodes, "number of edges :", num_of_edges)
+
+
 # pv.plot_degree_dist(G2)
 
 
@@ -232,16 +234,45 @@ def create_relationship_space(graph_pagerank, graph_modularity):
     return graph_pagerank
 
 
+# Calculate pagerank sum of the most popular module and return the module degree of the graph
+def morphospace_values(graph_pagerank, graph_modularity):
+    sum_pagerank = 0
+    for i in range(len(graph_modularity.columns) - 2):
+        product_asin = graph_modularity.at[0, str(i)]
+        # get its pagerank
+        for index, row in graph_pagerank.iterrows():
+            if product_asin == row['ASIN']:
+                # 0 is the column name unfortunately for the pagerank
+                sum_pagerank += row['0']
+                break
+    return sum_pagerank, graph_modularity.at[0, 'NumberOfNodes']
+
+
 # Calculate pagerank and modules
-g1_pagerank, g2_pagerank = page_rank_calculations(G1, G2)
-g1_modularity, g2_modularity = modularity_calculations(G1, G2)
+# g1_pagerank, g2_pagerank = page_rank_calculations(G1, G2)
+# g1_modularity, g2_modularity = modularity_calculations(G1, G2)
 
 # Create the R space
-g1_relationship = create_relationship_space(g1_pagerank, g1_modularity)
-g2_relationship = create_relationship_space(g2_pagerank, g2_modularity)
+# g1_relationship = create_relationship_space(g1_pagerank, g1_modularity)
+# g2_relationship = create_relationship_space(g2_pagerank, g2_modularity)
 
+# TODO: delete this part later, this is only for quickness. Read files
+g1_pagerank = pd.read_csv(g1_pagerank_file)
+g2_pagerank = pd.read_csv(g2_pagerank_file)
+g1_modularity = pd.read_csv(g1_modules_file)
+g2_modularity = pd.read_csv(g2_modules_file)
+
+# Get morphospace values for graphs
+sum_page_rank1, mod_degree1 = morphospace_values(g1_pagerank, g1_modularity)
+sum_page_rank2, mod_degree2 = morphospace_values(g2_pagerank, g2_modularity)
+print(sum_page_rank1)
+print(mod_degree1)
+print(sum_page_rank2)
+print(mod_degree2)
+
+# TODO undo comment below
 # Write to a file
-with open(g1_pagerank_file, 'w', newline='') as myfile:
-    g1_relationship.to_csv(g1_pagerank_file)
-with open(g2_pagerank_file, 'w', newline='') as myfile:
-    g2_relationship.to_csv(g2_pagerank_file)
+# with open(g1_pagerank_file, 'w', newline='') as myfile:
+#     g1_relationship.to_csv(g1_pagerank_file)
+# with open(g2_pagerank_file, 'w', newline='') as myfile:
+#     g2_relationship.to_csv(g2_pagerank_file)
