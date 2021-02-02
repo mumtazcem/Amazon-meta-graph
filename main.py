@@ -29,7 +29,7 @@ g1_db['nodeId'] = np.full((num_of_nodes1,), range(num_of_nodes1))
 num_of_nodes2, col2 = g2_db.shape
 g2_db['nodeId'] = np.full((num_of_nodes2,), range(num_of_nodes2))
 
-
+# Generate networkx version of our graphs here
 def generate_g1_g2():
     # Thresholded
     adj1_file = "saved_adj_matrices/adj1_min.csv"
@@ -120,7 +120,6 @@ def modularity_calculations(G1, G2, filename1, filename2):
     g1_max_len, g1_most_crowded_modules = most_crowded_module(g1_result_components)
     print("most_crowded_module include : ", g1_max_len, " nodes.")
     print("most_crowded_modules: ", g1_most_crowded_modules)
-    # pv.draw_networkx_graph(result_graph)
 
     g1_time = time.time()
     print("G1 modularity is finished in --- %s seconds ---" % (g1_time - start_time))
@@ -132,7 +131,6 @@ def modularity_calculations(G1, G2, filename1, filename2):
     g2_max_len, g2_most_crowded_modules = most_crowded_module(g2_result_components)
     print("most_crowded_module include : ", g2_max_len, " nodes.")
     print("most_crowded_modules: ", g2_most_crowded_modules)
-    # pv.draw_networkx_graph(result_graph)
 
     g2_time = time.time()
     print("G2 is finished --- %s seconds ---" % (g2_time - g1_time))
@@ -300,5 +298,5 @@ def do_all_calculations(G1, G2, file_mod1, file_mod2, file_pr1, file_pr2):
 # Generate real G1 G2
 # G1, G2 = generate_g1_g2()
 # do_all_calculations(G1, G2, g1_modules_file, g2_modules_file, g1_pagerank_file, g2_pagerank_file)
-do_calculations_using_file(g1_pagerank_file, g2_pagerank_file, g1_modules_file, g2_modules_file)
+# do_calculations_using_file(g1_pagerank_file, g2_pagerank_file, g1_modules_file, g2_modules_file)
 
