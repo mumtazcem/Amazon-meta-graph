@@ -123,13 +123,15 @@ with open(g2_morhpospace_file, 'w', newline='') as myfile:
 #     page_ranks_y_g1 = g1['PageRank'].tolist()
 #     page_ranks_y_g2 = g2['PageRank'].tolist()
 #     colors = ['red', 'blue']
+#     axes = plt.gca()
+#     axes.set_ylim([0,0.004])
 #     plt.scatter(mod_degrees_x_g1, page_ranks_y_g1, c = 'red', label = "Randoms G1")
 #     plt.scatter(mod_degrees_x_g2, page_ranks_y_g2, c = 'blue', label = "Randoms G2")
 #     plt.xlabel("Modularity degree")
 #     plt.ylabel("Page rank")
 #     plt.title("Morphospace modularity vs centrality")
-#     plt.scatter(6, 0.0026914075090193903, marker='s', color='red', label ="Orginal G1", s = 80)
-#     plt.scatter(7, 0.002812468086869622, marker='s', color='blue', label = "Orginal G2", s = 80)
+#     plt.scatter(6, 0.0026914075090193903, marker='s', color='red', label ="Orginal G1", s = 100)
+#     plt.scatter(7, 0.002812468086869622, marker='s', color='blue', label = "Orginal G2", s = 100)
 #     plt.legend()
 #     plt.show()
 
