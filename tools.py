@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Seed value for betweenness centrality and for random choices
-seed = 900
+random.seed(900)
 
 
 def randomize_graphs(G, number_of_new_graphs):
@@ -18,8 +18,8 @@ def randomize_graphs(G, number_of_new_graphs):
             # container for selected randomly, two existing, different edges
             selectedEdges = []
             while len(selectedEdges) < 2:
-                firstPartEdge = random.Random(seed).randrange(0, nodes_number - 1)
-                secondPartEdge = random.Random(seed).randrange(0, nodes_number - 1)
+                firstPartEdge = random.randrange(0, nodes_number - 1)
+                secondPartEdge = random.randrange(0, nodes_number - 1)
                 # checking if edge exist and if is not in selectdEdges
                 if tmp_graph.has_edge(firstPartEdge, secondPartEdge) and (
                         firstPartEdge, secondPartEdge) not in selectedEdges and (
@@ -66,6 +66,8 @@ number_of_random_graphs = 1
 g1_random_graphs = randomize_graphs(G1, number_of_random_graphs)
 g2_random_graphs = randomize_graphs(G2, number_of_random_graphs)
 
+print("Random graphs are created.")
+
 mod_degrees_x_g1 = []
 mod_degrees_x_g2 = []
 page_ranks_y_g1 = []
@@ -106,33 +108,32 @@ df2 = pd.DataFrame(data2)
 g1_morhpospace_file = "random_graph_results/g1_morphospace_random.csv"
 g2_morhpospace_file = "random_graph_results/g2_morphospace_random.csv"
 
-
 with open(g1_morhpospace_file, 'w', newline='') as myfile:
     df1.to_csv(g1_morhpospace_file)
 with open(g2_morhpospace_file, 'w', newline='') as myfile:
     df2.to_csv(g2_morhpospace_file)
 
 
-# def create_morphospace_plot():
-#     g1_morp = g1_morhpospace_file
-#     g2_morp = g2_morhpospace_file
-#     g1 = pd.read_csv(g1_morp)
-#     g2 = pd.read_csv(g2_morp)
-#     mod_degrees_x_g1 = g1['ModuleDegrees'].tolist()
-#     mod_degrees_x_g2 = g2['ModuleDegrees'].tolist()
-#     page_ranks_y_g1 = g1['PageRank'].tolist()
-#     page_ranks_y_g2 = g2['PageRank'].tolist()
-#     colors = ['red', 'blue']
-#     axes = plt.gca()
-#     axes.set_ylim([0,0.004])
-#     plt.scatter(mod_degrees_x_g1, page_ranks_y_g1, c = 'red', label = "Randoms G1")
-#     plt.scatter(mod_degrees_x_g2, page_ranks_y_g2, c = 'blue', label = "Randoms G2")
-#     plt.xlabel("Modularity degree")
-#     plt.ylabel("Page rank")
-#     plt.title("Morphospace modularity vs centrality")
-#     plt.scatter(6, 0.0026914075090193903, marker='s', color='red', label ="Orginal G1", s = 100)
-#     plt.scatter(7, 0.002812468086869622, marker='s', color='blue', label = "Orginal G2", s = 100)
-#     plt.legend()
-#     plt.show()
+def create_morphospace_plot():
+    g1_morp = g1_morhpospace_file
+    g2_morp = g2_morhpospace_file
+    g1 = pd.read_csv(g1_morp)
+    g2 = pd.read_csv(g2_morp)
+    mod_degrees_x_g1 = g1['ModuleDegrees'].tolist()
+    mod_degrees_x_g2 = g2['ModuleDegrees'].tolist()
+    page_ranks_y_g1 = g1['PageRank'].tolist()
+    page_ranks_y_g2 = g2['PageRank'].tolist()
+    colors = ['red', 'blue']
+    axes = plt.gca()
+    axes.set_ylim([0, 0.004])
+    plt.scatter(mod_degrees_x_g1, page_ranks_y_g1, c='red', label="Random Graphs of G1")
+    plt.scatter(mod_degrees_x_g2, page_ranks_y_g2, c='blue', label="Random Graphs of G2")
+    plt.xlabel("Modularity degree")
+    plt.ylabel("Page rank")
+    plt.title("Morphospace modularity vs centrality")
+    plt.scatter(6, 0.0026914075090193903, marker='*', color='red', label="Original G1", s=100)
+    plt.scatter(7, 0.002812468086869622, marker='*', color='blue', label="Original G2", s=100)
+    plt.legend()
+    plt.show()
 
 # create_morphospace_plot()
