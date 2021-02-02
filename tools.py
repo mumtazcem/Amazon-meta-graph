@@ -62,6 +62,9 @@ adj_2 = adj_2_pd.to_numpy()
 G1 = nx.from_numpy_matrix(adj_1)
 G2 = nx.from_numpy_matrix(adj_2)
 
+# this value is our n1 and n2, modify however you like
+# but be aware it would take a lot of time
+# the computation time is explained in jupyter notebook.
 number_of_random_graphs = 1
 g1_random_graphs = randomize_graphs(G1, number_of_random_graphs)
 g2_random_graphs = randomize_graphs(G2, number_of_random_graphs)
@@ -107,33 +110,34 @@ df2 = pd.DataFrame(data2)
 
 g1_morhpospace_file = "random_graph_results/g1_morphospace_random.csv"
 g2_morhpospace_file = "random_graph_results/g2_morphospace_random.csv"
-
+#
 with open(g1_morhpospace_file, 'w', newline='') as myfile:
     df1.to_csv(g1_morhpospace_file)
 with open(g2_morhpospace_file, 'w', newline='') as myfile:
     df2.to_csv(g2_morhpospace_file)
 
 
-def create_morphospace_plot():
-    g1_morp = g1_morhpospace_file
-    g2_morp = g2_morhpospace_file
-    g1 = pd.read_csv(g1_morp)
-    g2 = pd.read_csv(g2_morp)
-    mod_degrees_x_g1 = g1['ModuleDegrees'].tolist()
-    mod_degrees_x_g2 = g2['ModuleDegrees'].tolist()
-    page_ranks_y_g1 = g1['PageRank'].tolist()
-    page_ranks_y_g2 = g2['PageRank'].tolist()
-    colors = ['red', 'blue']
-    axes = plt.gca()
-    axes.set_ylim([0, 0.004])
-    plt.scatter(mod_degrees_x_g1, page_ranks_y_g1, c='red', label="Random Graphs of G1")
-    plt.scatter(mod_degrees_x_g2, page_ranks_y_g2, c='blue', label="Random Graphs of G2")
-    plt.xlabel("Modularity degree")
-    plt.ylabel("Page rank")
-    plt.title("Morphospace modularity vs centrality")
-    plt.scatter(6, 0.0026914075090193903, marker='*', color='red', label="Original G1", s=100)
-    plt.scatter(7, 0.002812468086869622, marker='*', color='blue', label="Original G2", s=100)
-    plt.legend()
-    plt.show()
+# def create_morphospace_plot():
+#     g1_morp = g1_morhpospace_file
+#     g2_morp = g2_morhpospace_file
+#     g1 = pd.read_csv(g1_morp)
+#     g2 = pd.read_csv(g2_morp)
+#     mod_degrees_x_g1 = g1['ModuleDegrees'].tolist()
+#     mod_degrees_x_g2 = g2['ModuleDegrees'].tolist()
+#     page_ranks_y_g1 = g1['PageRank'].tolist()
+#     page_ranks_y_g2 = g2['PageRank'].tolist()
+#     colors = ['red', 'blue']
+#     axes = plt.gca()
+#     axes.set_ylim([0, 0.004])
+#     plt.scatter(mod_degrees_x_g1, page_ranks_y_g1, c='red', label="Random Graphs of G1")
+#     plt.scatter(mod_degrees_x_g2, page_ranks_y_g2, c='blue', label="Random Graphs of G2")
+#     plt.xlabel("Modularity degree")
+#     plt.ylabel("Page rank")
+#     plt.title("Morphospace modularity vs centrality")
+#     plt.scatter(6, 0.0026914075090193903, marker='*', color='red', label="Original G1", s=100)
+#     plt.scatter(7, 0.002812468086869622, marker='*', color='blue', label="Original G2", s=100)
+#     plt.legend()
+#     plt.savefig("random_30_plot.png")
+#     plt.show()
 
 # create_morphospace_plot()

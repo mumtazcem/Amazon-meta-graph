@@ -203,5 +203,5 @@ def generate_g1_g2():
     return G1, G2
 
 
-G1, G2 = generate_g1_g2()
-plot_degree_dist_combined(G1, G2)
+# G1, G2 = generate_g1_g2()
+# plot_degree_dist_combined(G1, G2)
