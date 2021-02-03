@@ -1,14 +1,19 @@
 import pandas as pd
 import numpy as np
 
-# file_name = "amazon_first_100.txt"
+# Metadata of Amazon [1], It should be included to the project.
 file_name = "amazon-meta.txt"
 
+# Database file of parsed G1 products
 graph1_df_file = "saved_dataframes/g1Db.csv"
+# Database file of parsed G2 products
 graph2_df_file = "saved_dataframes/g2Db.csv"
 global_df_file = "saved_dataframes/database.csv"
 
-
+# This is our parser that reads whole amazon-meta.txt.
+# It is firstly converted to a dataframe which includes
+# the features that we need and then it is written to
+# graph1_df_file and graph2_df_file respectively.
 def main():
     product = {}
     productList = []
@@ -18,7 +23,8 @@ def main():
     reviewCounter = 0
     voteCounter = 0
 
-    dataFrameType = 1  # 1 : one dataframe; 2 : two dataframe
+    # Selected products to process
+    # Options : 'Book', 'Music', 'Video', 'DVD'
     selectedGroup1 = 'Video'
     selectedGroup2 = 'DVD'
 
@@ -115,9 +121,6 @@ def main():
     g1Db = pd.DataFrame.from_dict(g1PrList)
     # insert nodeID column
     num_of_nodes1, col1 = g1Db.shape
-    # TODO: in case we need to focus only nodes that have edges
-    #  make this line below work, yet it does not run since g1Db['totalSimilar'] is str
-    # g1Db = g1Db[g1Db['totalSimilar'] > 0]
     g1Db.insert(0, "nodeId", np.full((num_of_nodes1,), range(num_of_nodes1)), True)
     with open(graph1_df_file, 'w', newline='') as myfile:
         g1Db.to_csv(graph1_df_file)
@@ -125,9 +128,6 @@ def main():
     g2Db = pd.DataFrame.from_dict(g2PrList)
     # insert nodeID column
     num_of_nodes2, col2 = g2Db.shape
-    # TODO: in case we need to focus only nodes that have edges
-    #  make this line below work, yet it does not run since g1Db['totalSimilar'] is str
-    # g2Db = g2Db[g2Db['totalSimilar'] > 0]
     g2Db.insert(0, "nodeId", np.full((num_of_nodes2,), range(num_of_nodes2)), True)
     with open(graph2_df_file, 'w', newline='') as myfile:
         g2Db.to_csv(graph2_df_file)

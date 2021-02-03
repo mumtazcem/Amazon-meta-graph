@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import networkx as nx
-import project_view as pv
+import plot_creator as pv
 import time
 
 start_time = time.time()
