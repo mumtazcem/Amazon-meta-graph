@@ -19,10 +19,11 @@ Reference Metadata: https://snap.stanford.edu/data/amazon-meta.html
 
 Project Directory: https://github.com/mumtazcem/GraphProject
 
-@misc{snapnets,
-  author       = {Jure Leskovec and Andrej Krevl},
-  title        = {{SNAP Datasets}: {Stanford} Large Network Dataset Collection},
-  howpublished = {\url{http://snap.stanford.edu/data}},
-  month        = jun,
-  year         = 2014
-}
+## SNAP Reference
+<a id="1">[1]</a> 
+Jure Leskovec and Andrej Krevl
+SNAP Datasets: Stanford Large Network Dataset Collection
+http://snap.stanford.edu/data
+jun
+2014
+
